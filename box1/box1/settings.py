@@ -37,8 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # my custom application
-    "access_control"
+    # my custom applications
+    "access_control",
+    "cryptographic_vulns",
+    "xpath_injection"
+
 ]
 
 MIDDLEWARE = [
