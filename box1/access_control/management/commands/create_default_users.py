@@ -12,6 +12,8 @@ class Command(BaseCommand):
             {'username': 'otojon', 'password': 'password123', 'role': 'normal'},
             {'username': 'abbos', 'password': 'password123', 'role': 'normal'},
             {'username': 'admin', 'password': 'adminpassword', 'role': 'admin'},
+            {'username': 'admin2', 'password': '12345678', 'role': 'admin'},
+
         ]
 
         for user_data in users:

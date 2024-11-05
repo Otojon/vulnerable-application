@@ -20,5 +20,7 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('access_control.urls')),  # Include the Access Control URLs
+    path('', include('access_control.urls')),
+    path('', include('jwt_vulnerabilities.urls')),
+    # Include the Access Control URLs
 ]
