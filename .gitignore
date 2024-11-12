@@ -1,3 +1,5 @@
+#vscode debugger files
+.vscode
 #virtual-environment-files
 /venv
 /appenv

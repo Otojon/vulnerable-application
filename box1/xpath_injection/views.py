@@ -1,4 +1,4 @@
-from django.shortcuts import render
+import json
 import jwt
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -7,34 +7,16 @@ import xml.etree.ElementTree as ET
 import os
 
 # Path to the XML file
-XML_FILE_PATH = os.path.join(os.path.dirname(__file__), '../db/db.xml')
-"""
-later gonna replace it with the env variable
-"""
-SECRET_KEY = 'your_secret_key'  # Replace with a stronger key in production 
-
-
-
-# xpath_injection/views.py
-
-import jwt
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime, timedelta
-import xml.etree.ElementTree as ET
-import os
-
-# Path to the XML file
-XML_FILE_PATH = os.path.join(os.path.dirname(__file__), '../db/db.xml')
+XML_FILE_PATH = os.path.join(os.path.dirname(__file__), './db/db.xml')
 SECRET_KEY = 'your_secret_key'  # Replace with a stronger key in production
 
 @csrf_exempt
 def xpath_login_view(request):
     if request.method == "POST":
-        # Extract username and password from JSON request
-        data = request.json()
-        username_input = data.get("username")
-        password_input = data.get("password")
+        # Parse JSON data from the request
+        data = json.loads(request.body)
+        username_input = data.get("username").replace("'", "&apos;")
+        password_input = data.get("password").replace("'", "&apos;")
 
         # Parse XML and find the user using vulnerable XPath query
         tree = ET.parse(XML_FILE_PATH)
@@ -42,8 +24,11 @@ def xpath_login_view(request):
 
         # Vulnerable XPath Query - directly uses user input without sanitization
         xpath_query = f".//user[username/text()='{username_input}' and password/text()='{password_input}']"
-        user = root.find(xpath_query)
-        
+        try:
+            user = root.find(xpath_query)
+        except SyntaxError as e:
+            return JsonResponse({"error": "Invalid XPath query syntax"}, status=400)
+
         if user is not None:
             user_id = user.find("id").text
             username = user.find("username").text
