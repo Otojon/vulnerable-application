@@ -9,20 +9,31 @@ import os
 
 # Path to the XML file
 XML_FILE_PATH = os.path.join(os.path.dirname(__file__), './db/db.xml')
-SECRET_KEY = 'your_secret_key'  # Replace with a stronger key in production
+SECRET_KEY = 'sectey_key_of_xpath_injection'  # Replace with a stronger key in production
 
 @csrf_exempt
 def xpath_login_view(request):
     if request.method == "POST":
         # Parse JSON data from the request
-        data = json.loads(request.body)
-        username_input = data.get("username")
-        password_input = data.get("password")
+        try:
+            data = json.loads(request.body)
+            username_input = data.get("username")
+            password_input = data.get("password")
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+        if not username_input or not password_input:
+            return JsonResponse({"error": "Username and password are required"}, status=400)
 
         # Load and parse the XML file using lxml
-        with open(XML_FILE_PATH, "r") as file:
-            xml_content = file.read()
-        root = etree.fromstring(xml_content)
+        try:
+            with open(XML_FILE_PATH, "r") as file:
+                xml_content = file.read()
+            root = etree.fromstring(xml_content)
+        except FileNotFoundError:
+            return JsonResponse({"error": "XML file not found"}, status=500)
+        except etree.XMLSyntaxError as e:
+            return JsonResponse({"error": f"XML parsing error: {str(e)}"}, status=500)
 
         # Vulnerable XPath query that directly uses unfiltered input
         xpath_query = f".//user[username/text()='{username_input}' and password/text()='{password_input}']"
@@ -44,7 +55,7 @@ def xpath_login_view(request):
                 "userID": user_id,
                 "username": username,
                 "isAdmin": role == "admin",
-                "exp": datetime.now(timezone.utc) + timedelta(hours=1)
+                "exp": datetime.now() + timedelta(hours=1)  # Local time without UTC
             }
 
             # Create JWT token
@@ -60,7 +71,6 @@ def xpath_login_view(request):
 
 
 
-@csrf_exempt
 @csrf_exempt
 def xpath_profile_view(request):
     if request.method == "GET":

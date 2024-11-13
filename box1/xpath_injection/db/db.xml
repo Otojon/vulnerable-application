@@ -1,11 +1,12 @@
 <users>
-    <user>
-        <id>1</id>
-        <username>user1</username>
-        <password>user1pass</password>
-        <role>normal</role>
+        <user>
+        <id>1</id> 
+        <username>admin</username>
+        <password>adminpass</password>
+        <role>admin</role>
+        <flag>flag{some_flag_here}</flag>
     </user>
-    <user>
+     <user>
         <id>2</id>
         <username>user2</username>
         <password>user2pass</password>
@@ -13,9 +14,9 @@
     </user>
     <user>
         <id>3</id>
-        <username>admin</username>
-        <password>adminpass</password>
-        <role>admin</role>
-        <flag>flag{some_flag_here}</flag>
+        <username>user1</username>
+        <password>user1pass</password>
+        <role>normal</role>
     </user>
+   
 </users>
