@@ -23,4 +23,6 @@ urlpatterns = [
     path('', include('access_control.urls')),  # Include the Access Control URLs
     path('', include('cryptographic_vulns.urls')),  # Include cryptographic_vulns app
     path('', include('xpath_injection.urls')),  # Include cryptographic_vulns app
+    path('', include('cryptographic_vulns.urls')),  # Ensure this is correct
+
 ]

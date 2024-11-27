@@ -1,56 +1,86 @@
-from django.contrib.auth import authenticate
+import json
+import os
+from datetime import datetime, timedelta
+from base64 import b64encode, b64decode
 from django.http import JsonResponse
-from django.contrib.auth.models import User
-from cryptographic_vulns.models import UserProfile
-from rest_framework.decorators import api_view
-import hashlib
-import time
+from django.views.decorators.csrf import csrf_exempt
 
-@api_view(['POST'])
-def login_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
+DB_FILE_PATH = os.path.join(os.path.dirname(__file__), "db.json")
 
-    user = authenticate(username=username, password=password)
-    if user:
-        return JsonResponse({'message': 'Login successful', 'username': user.username})
-    else:
-        return JsonResponse({'error': 'Invalid credentials'}, status=403)
-@api_view(['GET'])
-def profile_view(request):
-    username = request.GET.get('username')
+
+# Load users from db.json
+def load_users():
+    if os.path.exists(DB_FILE_PATH):
+        with open(DB_FILE_PATH, "r") as file:
+            return json.load(file)
+    return []
+
+
+# Save users to db.json
+def save_users(users):
+    with open(DB_FILE_PATH, "w") as file:
+        json.dump(users, file, indent=4)
+
+
+@csrf_exempt
+def crypto_login_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        username_input = data.get("username")
+        password_input = data.get("password")
+
+        users = load_users()
+        user = next((u for u in users if u["username"] == username_input and u["password"] == password_input), None)
+
+        if user:
+            # Generate token
+            login_time = int(datetime.now().timestamp())
+            token_data = f"{user['id']}+{login_time}+{user['username']}"
+            token = b64encode(token_data.encode()).decode()
+
+            # Update the token in db.json
+            for u in users:
+                if u["username"] == username_input:
+                    u["token"] = token
+            save_users(users)
+
+            return JsonResponse({"message": "Login successful", "token": token})
+
+        return JsonResponse({"error": "Invalid credentials"}, status=401)
+
+    return JsonResponse({"error": "Only POST requests are allowed"}, status=405)
+
+
+@csrf_exempt
+def crypto_profile_view(request):
+    auth_header = request.headers.get("crypto-auth")
+    if not auth_header:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
 
     try:
-        user = User.objects.get(username=username)
-        profile = UserProfile.objects.get(user=user)
+        decoded_token = b64decode(auth_header).decode()
+        user_id, timestamp, username = decoded_token.split("+")
+        login_time = datetime.fromtimestamp(int(timestamp))
 
-        # Return profile information with the flag for the admin
-        return JsonResponse({
-            'username': user.username,
-            'role': profile.role,
-            'flag': profile.flag if profile.role == 'admin' else None
-        })
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'User not found'}, status=404)
+        users = load_users()
+        user = next((u for u in users if u["id"] == int(user_id) and u["token"] == auth_header), None)
 
-@api_view(['POST'])
-def password_reset_view(request):
-    username = request.data.get('username')
+        if user:
+            response = {
+                "id": user["id"],
+                "username": user["username"],
+                "role": user["role"],
+            }
 
-    try:
-        user = User.objects.get(username=username)
-        profile = UserProfile.objects.get(user=user)
+            if user["role"] == "admin":
+                response["flag"] = user.get("flag", "N/A")
+            else:
+                response["message"] = "Normal user logged in"
+                response["message"] = f"Admin user last login: {login_time.strftime('%Y-%m-%d %H:%M:%S')}"
 
-        # Simulate insecure randomness for token generation
-        current_time = str(int(time.time() * 1000))  # Milliseconds since epoch
-        token = hashlib.sha256((username + current_time).encode()).hexdigest()
+            return JsonResponse(response)
 
-        if profile.role == 'admin':
-            return JsonResponse({'message': 'Password reset link sent to your inbox'})
-        else:
-            # Return the reset token to the normal user
-            reset_link = f"http://localhost:8000/sandbox1/reset/{token}"
-            return JsonResponse({'reset_link': reset_link})
+        return JsonResponse({"error": "Unauthorized"}, status=401)
 
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=401)

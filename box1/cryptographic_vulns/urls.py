@@ -1,8 +1,7 @@
 from django.urls import path
-from .views import login_view, profile_view, password_reset_view
+from cryptographic_vulns.views import crypto_login_view, crypto_profile_view
 
 urlpatterns = [
-    path('sandbox1/login3/', login_view, name='login'),
-    path('sandbox1/profile3/', profile_view, name='profile'),
-    path('sandbox1/password-reset3/', password_reset_view, name='password-reset'),
+    path('sandbox1/crypto-login/', crypto_login_view, name='crypto-login'),
+    path('sandbox1/crypto-profile/', crypto_profile_view, name='crypto-profile'),
 ]
