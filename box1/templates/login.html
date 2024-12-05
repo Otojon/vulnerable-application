@@ -1,22 +1,29 @@
-<!-- jwt_vulnerabilities/templates/jwt_vulnerabilities/login.html -->
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Our Vulnerable Application</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-    <h2>Login</h2>
-    <form method="POST" action="{% url 'login' %}">
-        {% csrf_token %}
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br><br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
-
-        <button type="submit">Login</button>
-    </form>
+<body class="light-mode">
+    <header>
+        <img src="/path/to/your/logo.png" alt="Project Logo" style="height: 50px; vertical-align: middle;">
+        Login to Our Vulnerable Application
+        <button id="theme-toggle" class="button">Toggle Theme</button>
+    </header>
+    <div class="container">
+        <h1>Login</h1>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <button type="submit" class="button">Login</button>
+        </form>
+    </div>
+    <script src="theme-switcher.js"></script>
 </body>
 </html>

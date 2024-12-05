@@ -1,19 +1,112 @@
-<!-- jwt_vulnerabilities/templates/jwt_vulnerabilities/home.html -->
+<!-- home.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <h2>Welcome to the Home Page!</h2>
-    <p>Welcome, {{ user.username }}!</p>
-    <p>Your role: {{ profile.role }}</p>
+    <title>Welcome to Our Vulnerable Application</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-    <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            text-align: left;
+            font-size: 24px;
+        }
+
+        nav {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        nav a {
+            float: left;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .container {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .button {
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode {
+            background: #333;
+            color: #ccc;
+        }
+
+        .dark-mode header {
+            background-color: #0056b3;
+        }
+
+        .dark-mode nav {
+            background-color: #222;
+        }
+
+        .dark-mode nav a {
+            color: #ccc;
+        }
+
+        .dark-mode nav a:hover {
+            background-color: #555;
+        }
+
+        .dark-mode .button {
+            background-color: #0056b3;
+        }
+
+        .dark-mode .button:hover {
+            background-color: #003e7e;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <header>
+        <img src="newulogo.jpg" alt="Project Logo" style="height: 50px; vertical-align: middle;">
+        Our Vulnerable Application
+        <button id="theme-toggle" class="button">Toggle Theme</button>
+    </header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/login/">Login</a>
+        <a href="/faq/">FAQ</a>
+    </nav>
+    <div class="container">
+        <h1>Welcome!</h1>
+        <p>Explore the features of our application and learn more about JWT vulnerabilities.</p>
+        <button class="button" onclick="location.href='/login/'">Login</button>
+    </div>
+    <script>
+        document.getElementById('theme-toggle').addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
 </body>
 </html>

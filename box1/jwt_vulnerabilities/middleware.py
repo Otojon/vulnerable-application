@@ -1,7 +1,7 @@
+# middleware.py
 import jwt
 from django.http import JsonResponse
 from django.conf import settings
-from access_control.models import UserProfile
 
 SECRET_KEY = "mysecret"
 
@@ -13,7 +13,8 @@ class JWTAuthenticationMiddleware:
         token = request.COOKIES.get('jwt_token')
         if token:
             try:
-                decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+                # Vulnerable decode: No algorithm specified allows algorithm confusion
+                decoded = jwt.decode(token, SECRET_KEY, options={"verify_signature": False})
                 request.user_id = decoded.get('userID')
             except jwt.ExpiredSignatureError:
                 return JsonResponse({'error': 'Token expired'}, status=403)
