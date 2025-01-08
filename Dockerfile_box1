@@ -1,0 +1,18 @@
+# Dockerfile for box1
+FROM python:3.11-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the requirements file and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the entire box1 application into the container
+COPY box1/ /app/box1/
+
+# Set environment variables to avoid needing to input anything during migration
+ENV PYTHONUNBUFFERED 1
+
+# Run migrations and then start the Django development server
+CMD python manage.py migrate && python manage.py runserver 0.0.0.0:8000

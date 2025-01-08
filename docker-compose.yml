@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  # Service for box1
+  box1:
+    build:
+      context: .  # Builds from the current directory
+      dockerfile: Dockerfile_box1  # Path to the Dockerfile for box1
+    container_name: box1-container
+    ports:
+      - "8000:8000"  # Expose port 8000 of box1 to port 8000 on the host
+    volumes:
+      - ./box1:/app/box1  # Mount box1 source code to the container
+    environment:
+      - DEBUG=1
+
+  # Service for box2
+  box2:
+    build:
+      context: .  # Builds from the current directory
+      dockerfile: Dockerfile_box # Path to the Dockerfile for box2
+    container_name: box2-container
+    ports:
+      - "8001:8001"  # Expose port 8001 of box2 to port 8001 on the host
+    volumes:
+      - ./box2:/app/box2  # Mount box2 source code to the container
+    environment:
+      - DEBUG=1
