@@ -4,3 +4,4 @@ PyJWT==2.8.0
 djangorestframework
 requests
 mako
+jsonpickle

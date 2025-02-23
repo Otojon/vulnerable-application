@@ -1,3 +1,5 @@
+# burpsuite files left for debugging
+*.burp.*
 #vscode debugger files
 .vscode
 #virtual-environment-files
